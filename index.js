@@ -5,7 +5,7 @@
 //
 // 插件不往系统提示词里塞东西，也不拦消息——它只在被调用时干活。
 import { existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve, relative, isAbsolute } from 'node:path'
 import { Config, dshHome } from './lib/config.mjs'
 import { OneBot } from './lib/onebot.mjs'
 import { StickerStore } from './lib/store.mjs'
@@ -91,17 +91,19 @@ export function apply(ctx, rawConfig) {
         properties: {
           emotion: { type: 'string', description: '按情绪筛，比如 搞笑/嘲讽/卖萌/委屈' },
           q: { type: 'string', description: '关键词，会搜名字、标签、说明' },
+          withPaths: { type: 'boolean', description: '是否返回本地文件路径（默认不返回，仿真实例会脱敏）' },
         },
         additionalProperties: false,
       },
-      run({ emotion, q }) {
+      run({ emotion, q, withPaths }) {
         const items = store.list({ emotion: emotion || '', q: q || '' })
-        return { ok: true, count: items.length, dir: store.dir, items }
+        const out = withPaths ? items : items.map(({ file, ...rest }) => rest)
+        return { ok: true, count: out.length, dir: withPaths ? store.dir : undefined, items: out }
       },
     }),
     def({
       name: 'sticker_add',
-      description: '收一张表情进 QQ 收藏和本地库。给本地文件路径或图片 URL。会自动质检（太小/太大/糊的拒收），并按名字写备注。',
+      description: '收一张表情进 QQ 收藏和本地库。给 http(s) 图片地址，或表情袋目录里已下好的图（比如 sticker_candidates 拉下来的）。会自动质检（太小/太大/糊的拒收），并按名字写备注。',
       parameters: {
         type: 'object',
         properties: {
@@ -118,7 +120,23 @@ export function apply(ctx, rawConfig) {
       },
       async run({ file, name, emotion, content, tags, source, dryRun }) {
         let local = String(file || '')
-        if (/^https?:\/\//i.test(local)) {
+        const remote = /^https?:\/\//i.test(local)
+        // 本地路径只收"表情袋目录里已经下好的图"：这样 QQ 那边可以自己拉候选、自己收，
+        // 但拿不到"读任意本地路径"的口子。网页侧要收别处的图，先拷进 inbox 再收。
+        if (!remote) {
+          // 允许两处：表情库目录（storageDir）和插件自己的工作目录（candidates/ 与 downloads/）。
+          // 别的本地路径一律不给，防止仿真会话借这个口子探本机文件。
+          const roots = [resolve(store.dir), resolve(join(dshHome(), 'sticker-bag'))]
+          const abs = resolve(local)
+          const inside = roots.some((root) => {
+            const rel = relative(root, abs)
+            return rel !== '' && !rel.startsWith('..') && !isAbsolute(rel)
+          })
+          if (!inside) {
+            throw new Error('只能收表情袋目录里的图（候选图在 sticker-bag/candidates），或者直接给 http(s) 图片地址')
+          }
+        }
+        if (remote) {
           const r = await downloadEmote(local, join(dshHome(), 'sticker-bag', 'downloads'), name || 'emote')
           local = r.file
         }

@@ -53,11 +53,27 @@ dsh plugin --profile web add link:./dsh-sticker-bag
 
 | 工具 | 干什么 |
 | --- | --- |
-| `sticker_list` | 看库里有什么，可按情绪 / 关键词筛 |
-| `sticker_add` | 收一张（本地路径或图片 URL），自动质检、写备注 |
+| `sticker_list` | 看库里有什么，可按情绪 / 关键词筛（默认不返回本地绝对路径） |
+| `sticker_add` | 收一张：给 http(s) 图片地址，或表情袋目录里已下好的图；自动质检、写备注 |
 | `sticker_remove` | 删一张 |
-| `sticker_candidates` | 从 B站表情池拉一批候选到 inbox，挑着用 |
+| `sticker_candidates` | 从 B站表情池拉一批候选到 `<DSH_HOME>/sticker-bag/candidates`，挑着用 |
 | `sticker_send` | 发一张（私聊或群） |
+
+## 接到 QQ 会话（仿真会话）
+
+如果 QQ 侧走的是 agent preset（比如 `qq-chat-v2`），插件装在 profile 里**不会**自动出现在 QQ 会话——preset 有自己的插件行和执行期工具白名单。要两件事：
+
+1. preset 的 `agent.cordis.yml` 里加一行：
+
+```yaml
+- id: sticker-bag
+  name: 'dsh-sticker-bag'
+  config: {}
+```
+
+2. 如果你的 QQ 侧有类似 `qq-tool-restrict` 的执行期 guard，把五个 `sticker_*` 工具放进白名单。
+
+安全边界（给仿真实例用的）：`sticker_add` 收**本地路径**时只认两处——表情库目录（`storageDir`）和 `<DSH_HOME>/sticker-bag/`（`candidates/`、`downloads/`），其它路径一律拒。这样 QQ 侧能「自己拉候选、自己收、自己发」，但拿不到「读本机任意文件」的口子。需要从网络收图时直接给 `http(s)` 地址。
 
 ## 数据放在哪
 
