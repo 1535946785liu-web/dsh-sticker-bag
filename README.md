@@ -12,12 +12,12 @@
 ## 装
 
 ```bash
-# 全局装（推荐）
-dsh plugin --profile web add dsh-sticker-bag
+# 从 GitHub 装（改代码即时生效）
+git clone https://github.com/1535946785liu-web/dsh-sticker-bag.git
+dsh plugin --profile web add link:./dsh-sticker-bag
 
-# 或者从源码链进去（改代码即时生效）
-git clone https://github.com/<you>/dsh-sticker-bag.git
-dsh plugin --profile web add link:<你 clone 下来的目录>
+# 以后发到 npm 之后，也可以一行装：
+# dsh plugin --profile web add dsh-sticker-bag
 ```
 
 装完重启 DSH（或者等它热重载），打开 **设置 → 表情袋**。
