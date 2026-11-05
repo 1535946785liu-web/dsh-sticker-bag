@@ -75,6 +75,19 @@ dsh plugin --profile web add link:./dsh-sticker-bag
 
 安全边界（给仿真实例用的）：`sticker_add` 收**本地路径**时只认两处——表情库目录（`storageDir`）和 `<DSH_HOME>/sticker-bag/`（`candidates/`、`downloads/`），其它路径一律拒。这样 QQ 侧能「自己拉候选、自己收、自己发」，但拿不到「读本机任意文件」的口子。需要从网络收图时直接给 `http(s)` 地址。
 
+## 更新
+
+用 `link:` 装的，插件目录就是你 clone 下来的那份，更新只要：
+
+```bash
+cd dsh-sticker-bag
+git pull
+```
+
+然后重启 DSH（或者等它热重载）。不用重新 `dsh plugin add`，也不用动配置——`config.json` 和表情库都不在这个目录里。
+
+以后发到 npm 之后，装的是一份拷贝，那就等 DSH 的插件更新命令可用时再换（届时 README 会补上）。
+
 ## 数据放在哪
 
 ```
