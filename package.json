@@ -1,0 +1,44 @@
+{
+  "name": "dsh-sticker-bag",
+  "version": "0.1.0",
+  "description": "DSH 插件：表情袋 —— 把 QQ 收藏的表情包管起来（收图、打标签、按情绪挑、一键发）。Sticker bag for DeepSeek Harness: collect, tag and send QQ custom stickers.",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "sticker",
+    "emoji",
+    "qq",
+    "onebot"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib/**",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    ".gitignore"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  }
+}

@@ -1,0 +1,15 @@
+# ============================================================================
+# dsh-sticker-bag —— DSH bundle patch（插件自带的挂载声明）
+# ============================================================================
+# 装上之后，profile 只要在 `dsh.profile.bundles` 里列出本包名即生效：
+#
+#   dsh plugin --profile web add dsh-sticker-bag
+#   （本地开发：dsh plugin --profile web add link:<你自己的插件目录>）
+#
+# 这里只放默认值；用户配置在设置页里改，存到 <DSH_HOME>/sticker-bag/config.json。
+# ============================================================================
+
+- insert:
+    - id: sticker-bag
+      name: dsh-sticker-bag
+      config: {}
